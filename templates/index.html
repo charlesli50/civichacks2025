@@ -4,12 +4,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Audio Recorder</title>
+    <!-- <script src="./script.js"></script> -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
   </head>
   <body>
-    <h1>Audio Recorder</h1>
-    <button id="startBtn">Start Recording</button>
-    <button id="stopBtn" disabled>Stop Recording</button>
-    <audio id="audioPlayer" controls></audio>
+    <div class="container">
+      <h1>Feedback Form</h1>
+      <form id="surveyForm" method="POST">
+        <div class="question">
+          <p>How much help does your teacher provide you?</p>
+          <div class="options">
+            <label><input type="radio" name="q1" value="1" /> 1</label>
+            <label><input type="radio" name="q1" value="2" /> 2</label>
+            <label><input type="radio" name="q1" value="3" /> 3</label>
+            <label><input type="radio" name="q1" value="4" /> 4</label>
+            <label><input type="radio" name="q1" value="5" /> 5</label>
+          </div>
+        </div>
+
+        <div class="question">
+          <p>How difficult are your classes?</p>
+          <div class="options">
+            <label><input type="radio" name="q2" value="1" /> 1</label>
+            <label><input type="radio" name="q2" value="2" /> 2</label>
+            <label><input type="radio" name="q2" value="3" /> 3</label>
+            <label><input type="radio" name="q2" value="4" /> 4</label>
+            <label><input type="radio" name="q2" value="5" /> 5</label>
+          </div>
+        </div>
+
+        <div class="question">
+          <p>How much interest do you have for your classes?</p>
+          <div class="options">
+            <label><input type="radio" name="q3" value="1" /> 1</label>
+            <label><input type="radio" name="q3" value="2" /> 2</label>
+            <label><input type="radio" name="q3" value="3" /> 3</label>
+            <label><input type="radio" name="q3" value="4" /> 4</label>
+            <label><input type="radio" name="q3" value="5" /> 5</label>
+          </div>
+        </div>
+
+        <div class="question">
+          <p>How much do your peers push you in your class?</p>
+          <div class="options">
+            <label><input type="radio" name="q4" value="1" /> 1</label>
+            <label><input type="radio" name="q4" value="2" /> 2</label>
+            <label><input type="radio" name="q4" value="3" /> 3</label>
+            <label><input type="radio" name="q4" value="4" /> 4</label>
+            <label><input type="radio" name="q4" value="5" /> 5</label>
+          </div>
+        </div>
+
+        <div class="question">
+          <p>How well does your class prepare you for future success?</p>
+          <div class="options">
+            <label><input type="radio" name="q5" value="1" /> 1</label>
+            <label><input type="radio" name="q5" value="2" /> 2</label>
+            <label><input type="radio" name="q5" value="3" /> 3</label>
+            <label><input type="radio" name="q5" value="4" /> 4</label>
+            <label><input type="radio" name="q5" value="5" /> 5</label>
+          </div>
+        </div>
+        <button id="startBtn">Start Recording</button>
+        <button id="stopBtn" disabled>Stop Recording</button>
+        <audio id="audioPlayer" controls></audio>
+
+        <button type="submit" id="submit-btn">Submit Feedback</button>
+      </form>
+    </div>
 
     <script>
       let mediaRecorder;
@@ -19,6 +84,8 @@
       document
         .getElementById("startBtn")
         .addEventListener("click", async function () {
+          event.preventDefault();
+
           const stream = await navigator.mediaDevices.getUserMedia({
             audio: true,
           });
@@ -67,6 +134,25 @@
           document.getElementById("stopBtn").disabled = true;
         }
       }
+
+      document
+        .getElementById("surveyForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevents default form submission
+
+          let formData = new FormData(this);
+
+          fetch("/submit", {
+            method: "POST",
+            body: new URLSearchParams([...formData]),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => alert("Response received: " + JSON.stringify(data)))
+            .catch((error) => console.error("Error:", error));
+        });
     </script>
   </body>
 </html>

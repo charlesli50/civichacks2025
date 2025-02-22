@@ -41,7 +41,7 @@ def summarize_text_audio_transcription(df):
 
 
 if __name__ == '__main__':
-    print("hi!")
+    # print("hi!")
     # text = transcribe_audio()
     # print("Transcribed Text:")
     # print(text)
