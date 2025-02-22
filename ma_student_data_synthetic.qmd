@@ -1,0 +1,66 @@
+---
+title: "CivicHacks 2025 Project"
+author: "Leah Berti"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+
+# setting seed
+set.seed(222)
+
+# Define ethnicities and their respective probabilities
+ethnicities <- c("White", "Black", "Latino", "Asian", "Other")
+prob_ethnicity <- c(0.69, 0.10, 0.12, 0.08, 0.01)
+
+# English as a second language
+esl_binary <- c(0, 1)
+prob_esl <- c(0.89, 0.11)
+
+# generating dataframe
+survey_data <- data.frame(
+  # 7-digit ID
+  student_id = sample(1000000:9999999, 1000, replace = FALSE),
+  # house district
+  house = sample(1:160, 1000, replace = TRUE),
+  # grade level
+  grade_level = sample(0:12, 1000, replace = TRUE),
+  # ethnicity
+  ethnicity = sample(ethnicities, 1000, replace = TRUE, prob = prob_ethnicity),
+  # ESL
+  esl = sample(esl_binary, 1000, replace = TRUE, prob = prob_esl),
+  # "I receive help promptly when I don't understand something."
+  teacher_helpfulness = sample(1:5, 1000, replace = TRUE),
+  # "I feel challenged by the material that I am learning."
+  curriculum_rigor = sample(1:5, 1000, replace = TRUE),
+  # "I am interested in most of the material that I am learning."
+  student_interest = sample(1:5, 1000, replace = TRUE),
+  # "My classmates and I help each other learn."
+  peer_encouragement = sample(1:5, 1000, replace = TRUE),
+  # "I feel like school is preparing me for many good career options."
+  future_success = sample(1:5, 1000, replace = TRUE),
+  # placeholder for school level (empty for now)
+  school_level = NA
+)
+
+# Appending school level
+# Add school level column using dplyr's mutate() and case_when()
+survey_data <- survey_data %>%
+  mutate(school_level = case_when(
+    grade_level %in% 0:5 ~ "elementary",
+    grade_level %in% 6:8 ~ "middle",
+    grade_level %in% 9:12 ~ "high"
+  ))
+
+# previewing
+head(survey_data)
+
+# saving dataframe as CSV
+write.csv(survey_data, "survey_data.csv", row.names = FALSE)
+```
+
+
