@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 from pydub import AudioSegment
+import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
@@ -11,6 +12,8 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+df = pd.read_csv('./fake_survey_data')
 
 @app.route('/')
 def home():
