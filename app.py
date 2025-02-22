@@ -24,13 +24,22 @@ def upload_audio():
     file = request.files["audio"]
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
+        
 
     # Save WebM file
     webm_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
-    file.save(webm_path)
+    
 
     # Convert WebM to MP3 (or WAV if needed)
     mp3_path = webm_path.replace(".webm", ".wav")
+
+    if os.path.exists(webm_path):
+        os.remove(webm_path)
+    if os.path.exists(mp3_path):
+        os.remove(mp3_path)
+
+    file.save(webm_path)
+
     audio = AudioSegment.from_file(webm_path, format="webm")
     audio.export(mp3_path, format="wav")  # Convert to MP3
 
@@ -41,4 +50,4 @@ def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port = 5555, debug=True)
