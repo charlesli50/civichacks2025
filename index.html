@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form</title>
+</head>
+<body>
+    <h1>Form</h1>
+    <form>
+        <p>Question 1: How much assistance did your teacher provide you?</p>
+        <label>
+            <input type="radio" name="q1" value="1"> 1 
+        </label>
+        <label>
+            <input type="radio" name="q1" value="2"> 2
+        </label>
+        <label>
+            <input type="radio" name="q1" value="3"> 3
+        </label>
+        <label>
+            <input type="radio" name="q1" value="4"> 4 
+        </label>
+        <label>
+            <input type="radio" name="q1" value="5"> 5
+        </label>
+
+        <p>Question 2: How much did you learn from this class?</p>
+        <label>
+            <input type="radio" name="q2" value="1"> 1
+        </label>
+        <label>
+            <input type="radio" name="q2" value="2"> 2
+        </label>
+        <label>
+            <input type="radio" name="q2" value="3"> 3
+        </label>
+        <label>
+            <input type="radio" name="q2" value="4"> 4
+        </label>
+        <label>
+            <input type="radio" name="q2" value="5"> 5
+        </label>
+
+        <p>Question 3: How enganged are you in this class? </p>
+        <label>
+            <input type="radio" name="q3" value="1"> 1
+        </label>
+        <label>
+            <input type="radio" name="q3" value="2"> 2
+        </label>
+        <label>
+            <input type="radio" name="q3" value="3"> 3
+        </label>
+        <label>
+            <input type="radio" name="q3" value="4"> 4
+        </label>
+        <label>
+            <input type="radio" name="q3" value="5"> 5
+        </label>
+        <br><br>
+        <input type="submit" value="Submit">
+
+
+        <p>Please share your experience below</p>
+    </form>
+</body>
+
+<body>
+    <h1>Audio Recorder</h1>
+    <button id="startBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop Recording</button>
+    <audio id="audioPlayer" controls></audio>
+
+    <script>
+      let mediaRecorder;
+      let audioChunks = [];
+      let recordTimeout;
+
+      document
+        .getElementById("startBtn")
+        .addEventListener("click", async function () {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+          };
+
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            document.getElementById("audioPlayer").src = audioUrl;
+
+            // Save to the server
+            const formData = new FormData();
+            formData.append("audio", audioBlob, "recording.webm");
+
+            fetch("/upload", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.text())
+              .then((data) => console.log(data))
+              .catch((error) => console.error("Error uploading:", error));
+          };
+
+          mediaRecorder.start();
+          document.getElementById("startBtn").disabled = true;
+          document.getElementById("stopBtn").disabled = false;
+
+          // Automatically stop recording after 30 seconds
+          recordTimeout = setTimeout(() => stopRecording(), 30000);
+        });
+
+      document.getElementById("stopBtn").addEventListener("click", function () {
+        stopRecording();
+      });
+
+      function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+          mediaRecorder.stop();
+          clearTimeout(recordTimeout);
+          document.getElementById("startBtn").disabled = false;
+          document.getElementById("stopBtn").disabled = true;
+        }
+      }
+    </script>
+  </body>
+</html>
